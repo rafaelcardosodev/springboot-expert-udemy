@@ -14,6 +14,8 @@ import java.util.List;
 public class ClienteRepository {
 
     private static String INSERT = "INSERT INTO CLIENTE(NOME) VALUES (?)";
+    private static String UPDATE = "UPDATE CLIENTE SET NOME = ? WHERE ID = ?";
+    private static String DELETE = "DELETE FROM CLIENTE WHERE ID = ?";
     private static String SELECT_ALL = "SELECT * FROM CLIENTE";
 
     @Autowired
@@ -24,13 +26,40 @@ public class ClienteRepository {
         return cliente;
     }
 
+    public Cliente update(Cliente cliente) {
+        jdbcTemplate.update(UPDATE, new Object[]{cliente.getNome(), cliente.getId()});
+        return cliente;
+    }
+
+    public void delete(Integer id) {
+        jdbcTemplate.update(DELETE, new Object[]{id});
+    }
+
+    public void delete(Cliente cliente) {
+        jdbcTemplate.update(DELETE, new Object[]{cliente.getId()});
+    }
+
     public List<Cliente> getAll() {
-        return jdbcTemplate.query(SELECT_ALL, new RowMapper<Cliente>() {
+        return jdbcTemplate.query(SELECT_ALL, getClienteRowMapper());
+    }
+
+    private static RowMapper<Cliente> getClienteRowMapper() {
+        return new RowMapper<Cliente>() {
 
             @Override
             public Cliente mapRow(ResultSet resultSet, int i) throws SQLException {
-                return new Cliente(resultSet.getString("nome"));
+                return new Cliente(
+                        resultSet.getInt("id"),
+                        resultSet.getString("nome")
+                );
             }
-        });
+        };
+    }
+
+    public List<Cliente> getByNome(String nome) {
+        return jdbcTemplate.query(
+                SELECT_ALL.concat(" WHERE NOME LIKE ?"),
+                new Object[]{"%" + nome + "%"},
+                getClienteRowMapper());
     }
 }
