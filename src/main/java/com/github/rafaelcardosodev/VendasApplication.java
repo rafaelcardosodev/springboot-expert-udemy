@@ -20,32 +20,12 @@ public class VendasApplication {
         return args -> {
 
             System.out.println("salvando...");
-            clienteRepository.save(new Cliente("Rafael"));
+            clienteRepository.save(new Cliente("Rafaela"));
             clienteRepository.save(new Cliente("Maria"));
-            List<Cliente> clientes = clienteRepository.getAll();
+
+            List<Cliente> clientes = clienteRepository.encontrarPorNome("Rafael");
             clientes.forEach(System.out::println);
 
-            System.out.println("atualizando...");
-            clientes.forEach(c -> {
-                c.setNome(c.getNome() + " atualizado");
-                clienteRepository.update(c);
-            });
-            clientes = clienteRepository.getAll();
-            clientes.forEach(System.out::println);
-
-            System.out.println("buscando por nome...");
-            clienteRepository.getByNome("af").forEach(System.out::println);
-
-            System.out.println("deletando...");
-            clienteRepository.getAll().forEach(c -> {
-                clienteRepository.delete(c);
-            });
-            clientes = clienteRepository.getAll();
-            if (clientes.isEmpty()) {
-                System.out.println("nenhum cliente encontrado");
-            } else {
-                clientes.forEach(System.out::println);
-            }
         };
     }
 
